@@ -11,10 +11,46 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  name     String
-  email    String
-  phone    String
-  cpf      String
-  password String
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String
+  cpf       String
+  password  String
+  userType  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Address   Address[]
+}
+
+model State {
+  id        Int      @id @default(autoincrement())
+  name      String
+  sigla     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  City      City[]
+}
+
+model City {
+  id        Int       @id @default(autoincrement())
+  name      String
+  state     State     @relation(fields: [state_id], references: [id])
+  state_id  Int
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Address   Address[]
+}
+
+model Address {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  user       User     @relation(fields: [user_id], references: [id])
+  complement String
+  number     Int
+  cep        String
+  city_id    Int
+  city       City     @relation(fields: [city_id], references: [id])
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 }
