@@ -1,7 +1,4 @@
-export interface Address {
-  id: number;
+export interface CreateCityDto {
   name: number;
   state_id: number;
-  createdAt: Date;
-  updatedAt: Date;
 }
