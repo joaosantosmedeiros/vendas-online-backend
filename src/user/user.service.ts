@@ -2,26 +2,28 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { User } from './interfaces/user-interface';
 import { hashSync } from 'bcrypt';
+import { PrismaService } from 'src/prisma.service';
 
 @Injectable()
 export class UserService {
-  private users: User[] = [];
+  constructor(private readonly prismaService: PrismaService) {}
 
   async getAllUsers(): Promise<User[]> {
-    return this.users;
+    return this.prismaService.user.findMany({});
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const saltOrRounds = 10;
     const hashedPassword = hashSync(createUserDto.password, saltOrRounds);
 
-    const user: User = {
-      id: this.users.length,
+    const raw = {
       ...createUserDto,
       password: hashedPassword,
     };
 
-    this.users.push(user);
+    const user = await this.prismaService.user.create({
+      data: raw,
+    });
 
     return user;
   }
