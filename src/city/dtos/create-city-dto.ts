@@ -1,4 +1,4 @@
 export interface CreateCityDto {
-  name: number;
+  name: string;
   state_id: number;
 }
