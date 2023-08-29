@@ -1,35 +1,24 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { City } from './entities/city-entity';
 import { CreateCityDto } from './dtos/create-city-dto';
-import { CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Cache } from 'cache-manager';
+import { CacheService } from 'src/cache/cache.service';
 
 @Injectable()
 export class CityService {
   constructor(
     private readonly prismaService: PrismaService,
-    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+    private readonly cacheService: CacheService,
   ) {}
 
   async getAllCitiesByStateId(state_id: number): Promise<City[]> {
-    const citiesCache: City[] = await this.cacheManager.get(
-      `state_${state_id}`,
-    );
-
-    if (citiesCache) {
-      return citiesCache;
-    }
-
-    const cities = await this.prismaService.city.findMany({
-      where: {
-        state_id,
-      },
+    return this.cacheService.getCache<City[]>(`state_${state_id}`, () => {
+      return this.prismaService.city.findMany({
+        where: {
+          state_id,
+        },
+      });
     });
-
-    await this.cacheManager.set(`state_${state_id}`, cities);
-
-    return cities;
   }
 
   async create(data: CreateCityDto): Promise<City> {
