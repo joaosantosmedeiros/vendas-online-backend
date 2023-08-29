@@ -14,10 +14,17 @@ export class UserService {
         id: userId,
       },
       include: {
-        Address: true,
+        Address: {
+          include: {
+            city: {
+              include: {
+                state: true,
+              },
+            },
+          },
+        },
       },
     });
-
     return user;
   }
 
