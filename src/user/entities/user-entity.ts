@@ -1,4 +1,6 @@
-export interface User {
+import { Address } from 'src/address/entities/addresss-entity';
+
+export class User {
   id: number;
   name: string;
   email: string;
@@ -7,4 +9,5 @@ export interface User {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+  Address?: Address[];
 }

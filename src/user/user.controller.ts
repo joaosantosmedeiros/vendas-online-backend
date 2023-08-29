@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Get,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -9,11 +10,18 @@ import {
 import { CreateUserDto } from './dtos/create-user-dto';
 import { UserService } from './user.service';
 import { User } from './entities/user-entity';
-import { ReturnUserDto } from './dtos/return-usser-dto';
+import { ReturnUserDto } from './dtos/return-user-dto';
 
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
+
+  @Get(':userId')
+  async getUserById(@Param('userId') userId: number): Promise<ReturnUserDto> {
+    return new ReturnUserDto(
+      await this.userService.getUserByIdUsingRelations(Number(userId)),
+    );
+  }
 
   @Get()
   async getAllUsers(): Promise<ReturnUserDto[]> {

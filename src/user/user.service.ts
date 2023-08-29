@@ -8,6 +8,19 @@ import { PrismaService } from 'src/prisma.service';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async getUserByIdUsingRelations(userId: number): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: {
+        id: userId,
+      },
+      include: {
+        Address: true,
+      },
+    });
+
+    return user;
+  }
+
   async getAllUsers(): Promise<User[]> {
     return this.prismaService.user.findMany({});
   }
