@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { User } from './entities/user-entity';
 import { hashSync } from 'bcrypt';
@@ -61,6 +65,14 @@ export class UserService {
   }
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
+    const user = await this.getUserByEmail(createUserDto.email).catch(
+      () => undefined,
+    );
+
+    if (user) {
+      throw new BadRequestException('Email in use.');
+    }
+
     const saltOrRounds = 10;
     const hashedPassword = hashSync(createUserDto.password, saltOrRounds);
 
@@ -69,10 +81,8 @@ export class UserService {
       password: hashedPassword,
     };
 
-    const user = await this.prismaService.user.create({
+    return await this.prismaService.user.create({
       data: raw,
     });
-
-    return user;
   }
 }
