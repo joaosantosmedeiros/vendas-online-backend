@@ -8,6 +8,20 @@ import { PrismaService } from 'src/prisma.service';
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
+  async getUserByEmail(email: string) {
+    const user = this.prismaService.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (!user) {
+      throw new NotFoundException('Email not found.');
+    }
+
+    return user;
+  }
+
   async getUserByIdUsingRelations(userId: number): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: {
