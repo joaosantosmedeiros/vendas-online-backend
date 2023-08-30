@@ -10,4 +10,5 @@ export class User {
   createdAt: Date;
   updatedAt: Date;
   Address?: Address[];
+  userType: number;
 }

@@ -3,12 +3,19 @@ import { User } from 'src/user/entities/user-entity';
 import { LoginDto } from './dtos/login-dto';
 import { UserService } from 'src/user/user.service';
 import { compareSync } from 'bcrypt';
+import { ReturnLoginDto } from './dtos/return-login-dto';
+import { ReturnUserDto } from 'src/user/dtos/return-user-dto';
+import { JwtService } from '@nestjs/jwt';
+import { AccessTokenPayload } from 'src/address/dtos/access-token-payload-dto';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private jwtService: JwtService,
+  ) {}
 
-  async login(loginDto: LoginDto): Promise<User> {
+  async login(loginDto: LoginDto): Promise<ReturnLoginDto> {
     const user: User = await this.userService
       .getUserByEmail(loginDto.email)
       .catch(() => undefined);
@@ -22,6 +29,9 @@ export class AuthService {
       throw new NotFoundException('Incorrect email or password');
     }
 
-    return user;
+    return {
+      accessToken: this.jwtService.sign({ ...new AccessTokenPayload(user) }),
+      user: new ReturnUserDto(user),
+    };
   }
 }
