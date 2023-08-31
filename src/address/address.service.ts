@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { CreateAddressDto } from './dtos/create-address-dto';
 import { Address } from './entities/addresss-entity';
@@ -25,5 +25,26 @@ export class AddressService {
         ...createAddressDto,
       },
     });
+  }
+
+  async getAddressByUserId(userId: number): Promise<Address[]> {
+    const addresses = await this.prismaService.address.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        city: {
+          include: {
+            state: true,
+          },
+        },
+      },
+    });
+
+    if (!addresses || addresses.length == 0) {
+      throw new NotFoundException(`Address not found for userId: ${userId}`);
+    }
+
+    return addresses;
   }
 }
