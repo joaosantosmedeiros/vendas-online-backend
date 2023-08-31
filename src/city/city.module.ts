@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { CityController } from './city.controller';
 import { CityService } from './city.service';
-import { PrismaService } from 'src/prisma.service';
-import { CacheModule } from 'src/cache/cache.module';
+import { PrismaService } from '../prisma.service';
+import { CacheModule } from '../cache/cache.module';
 
 @Module({
   imports: [CacheModule],

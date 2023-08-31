@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 import { CreateAddressDto } from './dtos/create-address-dto';
 import { Address } from './entities/addresss-entity';
-import { UserService } from 'src/user/user.service';
-import { CityService } from 'src/city/city.service';
+import { UserService } from '../user/user.service';
+import { CityService } from '../city/city.service';
 
 @Injectable()
 export class AddressService {

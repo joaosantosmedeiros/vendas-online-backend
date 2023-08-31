@@ -1,4 +1,4 @@
-import { State } from 'src/state/entities/state-entity';
+import { State } from '../../state/entities/state-entity';
 
 export interface City {
   id: number;

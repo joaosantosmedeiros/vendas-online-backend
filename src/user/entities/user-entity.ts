@@ -1,4 +1,4 @@
-import { Address } from 'src/address/entities/addresss-entity';
+import { Address } from '../../address/entities/addresss-entity';
 
 export class User {
   id: number;

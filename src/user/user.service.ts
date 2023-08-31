@@ -6,14 +6,14 @@ import {
 import { CreateUserDto } from './dtos/create-user-dto';
 import { User } from './entities/user-entity';
 import { hashSync } from 'bcrypt';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getUserByEmail(email: string) {
-    const user = this.prismaService.user.findFirst({
+  async getUserByEmail(email: string): Promise<User> {
+    const user = await this.prismaService.user.findFirst({
       where: {
         email,
       },
@@ -47,7 +47,7 @@ export class UserService {
   }
 
   async getAllUsers(): Promise<User[]> {
-    return this.prismaService.user.findMany({});
+    return await this.prismaService.user.findMany({});
   }
 
   async getUserById(userId: number): Promise<User> {

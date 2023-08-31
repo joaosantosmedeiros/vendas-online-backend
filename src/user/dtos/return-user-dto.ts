@@ -1,5 +1,5 @@
 import { User } from '../entities/user-entity';
-import { ReturnAddressDto } from 'src/address/dtos/return-address-dto';
+import { ReturnAddressDto } from '../../address/dtos/return-address-dto';
 
 export class ReturnUserDto {
   id: number;
