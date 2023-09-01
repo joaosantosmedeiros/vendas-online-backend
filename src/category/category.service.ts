@@ -15,7 +15,21 @@ export class CategoryService {
     return this.prismaService.category.findMany({});
   }
 
-  async findCategoryByName(name: string): Promise<Category | null> {
+  async findCategoryById(id: number): Promise<Category> {
+    const category = await this.prismaService.category.findFirst({
+      where: {
+        id,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException('Category not found');
+    }
+
+    return category;
+  }
+
+  async findCategoryByName(name: string): Promise<Category> {
     const category = this.prismaService.category.findFirst({
       where: {
         name,
