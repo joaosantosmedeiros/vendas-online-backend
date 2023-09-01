@@ -7,6 +7,7 @@ import { CreateUserDto } from './dtos/create-user-dto';
 import { User } from './entities/user-entity';
 import { hashSync } from 'bcrypt';
 import { PrismaService } from '../prisma.service';
+import { UserType } from './enum/userType-enum';
 
 @Injectable()
 export class UserService {
@@ -79,6 +80,7 @@ export class UserService {
     const raw = {
       ...createUserDto,
       password: hashedPassword,
+      userType: UserType.User,
     };
 
     return await this.prismaService.user.create({
