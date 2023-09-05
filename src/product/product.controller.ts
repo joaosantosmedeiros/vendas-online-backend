@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -30,5 +33,14 @@ export class ProductController {
   @Post()
   async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productService.create(createProductDto);
+  }
+
+  @Roles(UserType.Admin)
+  @UsePipes(ValidationPipe)
+  @Delete(':productId')
+  @HttpCode(204)
+  async delete(@Param('productId') productId: number): Promise<void> {
+    productId = Number(productId);
+    await this.productService.delete(productId);
   }
 }
