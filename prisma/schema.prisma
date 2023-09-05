@@ -21,6 +21,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   Address   Address[]
+  Cart      Cart[]
 }
 
 model State {
@@ -72,4 +73,12 @@ model Product {
   image       String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Cart {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  user      User     @relation(fields: [user_id], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
