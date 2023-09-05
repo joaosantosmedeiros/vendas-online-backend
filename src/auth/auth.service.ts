@@ -2,11 +2,11 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from '../user/entities/user-entity';
 import { LoginDto } from './dtos/login-dto';
 import { UserService } from '../user/user.service';
-import { compareSync } from 'bcrypt';
 import { ReturnLoginDto } from './dtos/return-login-dto';
 import { ReturnUserDto } from '../user/dtos/return-user-dto';
 import { JwtService } from '@nestjs/jwt';
 import { AccessTokenPayload } from '../address/dtos/access-token-payload-dto';
+import { validatePassword } from 'src/utils/validate-password';
 
 @Injectable()
 export class AuthService {
@@ -20,7 +20,7 @@ export class AuthService {
       .getUserByEmail(loginDto.email)
       .catch(() => undefined);
 
-    const isMatch = compareSync(
+    const isMatch = await validatePassword(
       loginDto.password,
       user?.password ?? `${loginDto.password}1`,
     );

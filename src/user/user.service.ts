@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dtos/create-user-dto';
 import { User } from './entities/user-entity';
-import { hashSync } from 'bcrypt';
 import { PrismaService } from '../prisma.service';
 import { UserType } from './enum/userType-enum';
+import { UpdatePasswordDto } from './dtos/update-password-dto';
+import { createHashedPassword } from 'src/utils/hash-password';
+import { validatePassword } from 'src/utils/validate-password';
 
 @Injectable()
 export class UserService {
@@ -74,8 +76,7 @@ export class UserService {
       throw new BadRequestException('Email in use.');
     }
 
-    const saltOrRounds = 10;
-    const hashedPassword = hashSync(createUserDto.password, saltOrRounds);
+    const hashedPassword = await createHashedPassword(createUserDto.password);
 
     const raw = {
       ...createUserDto,
@@ -85,6 +86,41 @@ export class UserService {
 
     return await this.prismaService.user.create({
       data: raw,
+    });
+  }
+
+  async updatePassword(
+    updatePasswordDto: UpdatePasswordDto,
+    userId: number,
+  ): Promise<User> {
+    if (userId === undefined) {
+      throw new BadRequestException('Invalid userId.');
+    }
+
+    const user = await this.getUserById(userId);
+
+    const isMatch = await validatePassword(
+      updatePasswordDto.password,
+      user.password,
+    );
+
+    if (!isMatch) {
+      throw new BadRequestException('Invalid password.');
+    }
+
+    if (
+      updatePasswordDto.newPassword !== updatePasswordDto.confirmationPassword
+    ) {
+      throw new BadRequestException("Passwords don't match.");
+    }
+
+    const hashedPassword = await createHashedPassword(
+      updatePasswordDto.newPassword,
+    );
+
+    return this.prismaService.user.update({
+      data: { password: hashedPassword },
+      where: { id: user.id },
     });
   }
 }
