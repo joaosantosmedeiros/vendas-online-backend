@@ -80,6 +80,7 @@ model Cart {
   id          Int           @id @default(autoincrement())
   user_id     Int
   user        User          @relation(fields: [user_id], references: [id])
+  active      Boolean
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   CartProduct CartProduct[]
