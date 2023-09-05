@@ -3,6 +3,7 @@ import { PrismaService } from 'src/prisma.service';
 import { Product } from './entities/product';
 import { CreateProductDto } from './dto/create-product-dto';
 import { CategoryService } from 'src/category/category.service';
+import { UpdateProductDto } from './dto/update-product-dto';
 
 @Injectable()
 export class ProductService {
@@ -39,6 +40,18 @@ export class ProductService {
     await this.findProductById(id);
     await this.prismaService.product.delete({
       where: { id },
+    });
+  }
+
+  async updateProduct(
+    productId: number,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
+    const product = await this.findProductById(productId);
+    await this.categoryService.findCategoryById(updateProductDto.category_id);
+    return await this.prismaService.product.update({
+      data: { ...product, ...updateProductDto },
+      where: { id: product.id },
     });
   }
 }

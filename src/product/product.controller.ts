@@ -6,6 +6,7 @@ import {
   HttpCode,
   Param,
   Post,
+  Put,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -15,6 +16,7 @@ import { ProductService } from './product.service';
 import { ReturnProductDto } from './dto/return-product-dto';
 import { CreateProductDto } from './dto/create-product-dto';
 import { Product } from '@prisma/client';
+import { UpdateProductDto } from './dto/update-product-dto';
 
 @Roles(UserType.Admin, UserType.User)
 @Controller('product')
@@ -42,5 +44,18 @@ export class ProductController {
   async delete(@Param('productId') productId: number): Promise<void> {
     productId = Number(productId);
     await this.productService.delete(productId);
+  }
+
+  @Roles(UserType.Admin)
+  @UsePipes(ValidationPipe)
+  @Put(':productId')
+  async update(
+    @Param('productId') productId: number,
+    @Body() updateProductDto: UpdateProductDto,
+  ) {
+    return await this.productService.updateProduct(
+      Number(productId),
+      updateProductDto,
+    );
   }
 }
