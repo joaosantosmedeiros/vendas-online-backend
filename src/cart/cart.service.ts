@@ -51,6 +51,18 @@ export class CartService {
 
     await this.cartProductService.insertProductInCart(insertCartDto, cart);
 
-    return this.findCartByUserID(userId, true);
+    return cart;
+  }
+
+  async clearCart(userId: number): Promise<boolean> {
+    const cart = await this.findCartByUserID(userId, true);
+    await this.prismaService.cart.update({
+      where: { id: cart.id },
+      data: {
+        active: false,
+      },
+    });
+
+    return true;
   }
 }
