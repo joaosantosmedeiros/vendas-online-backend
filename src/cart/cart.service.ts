@@ -2,16 +2,27 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InsertCartDto } from './dtos/insert-cart-dto';
 import { Cart } from './entities/cart-entity';
 import { PrismaService } from 'src/prisma.service';
+import { CartProductService } from 'src/cart-product/cart-product.service';
 
 @Injectable()
 export class CartService {
-  constructor(private readonly prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly cartProductService: CartProductService,
+  ) {}
 
-  async verifyActiveCart(userId: number): Promise<Cart> {
+  async findCartByUserID(userId: number, isIncluded?: boolean): Promise<Cart> {
+    const include =
+      isIncluded == true
+        ? { CartProduct: { include: { product: true } } }
+        : undefined;
+
     const cart: Cart = await this.prismaService.cart.findFirst({
       where: {
         user_id: userId,
+        active: true,
       },
+      include,
     });
 
     if (!cart) {
@@ -34,10 +45,12 @@ export class CartService {
     insertCartDto: InsertCartDto,
     userId: number,
   ): Promise<Cart> {
-    const cart = await this.verifyActiveCart(userId).catch(async () =>
+    const cart = await this.findCartByUserID(userId).catch(async () =>
       this.createCart(userId),
     );
 
-    return cart;
+    await this.cartProductService.insertProductInCart(insertCartDto, cart);
+
+    return this.findCartByUserID(userId, true);
   }
 }
