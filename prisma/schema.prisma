@@ -96,3 +96,26 @@ model CartProduct {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
+
+model PaymentStatus {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  Payment   Payment[]
+}
+
+model Payment {
+  id              Int           @id @default(autoincrement())
+  status_id       Int
+  payment_status  PaymentStatus @relation(fields: [status_id], references: [id])
+  price           Float
+  discount        Int
+  final_price     Float
+  type            String
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  code            Int?
+  payment_date    DateTime?
+  amount_payments Int?
+}
