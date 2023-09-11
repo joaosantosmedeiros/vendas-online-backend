@@ -3,6 +3,7 @@ import { InsertCartDto } from './dtos/insert-cart-dto';
 import { Cart } from './entities/cart-entity';
 import { PrismaService } from 'src/prisma.service';
 import { CartProductService } from 'src/cart-product/cart-product.service';
+import { UpdateCartDto } from './dtos/update-cart-dto';
 
 @Injectable()
 export class CartService {
@@ -64,5 +65,24 @@ export class CartService {
     });
 
     return true;
+  }
+
+  async deleteProductCart(userId: number, productId: number) {
+    const cart = await this.findCartByUserID(userId);
+
+    return this.cartProductService.deleteProductCart(productId, cart.id);
+  }
+
+  async updateProductInCart(
+    updateCartDto: UpdateCartDto,
+    userId: number,
+  ): Promise<Cart> {
+    const cart = await this.findCartByUserID(userId).catch(async () =>
+      this.createCart(userId),
+    );
+
+    await this.cartProductService.updateProductInCart(updateCartDto, cart);
+
+    return cart;
   }
 }

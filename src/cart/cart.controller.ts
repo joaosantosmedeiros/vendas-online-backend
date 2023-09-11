@@ -4,6 +4,8 @@ import {
   Delete,
   Get,
   HttpCode,
+  Param,
+  Patch,
   Post,
   UsePipes,
   ValidationPipe,
@@ -14,6 +16,7 @@ import { UserId } from 'src/decorators/user-id-decorator';
 import { UserType } from 'src/user/enum/userType-enum';
 import { Roles } from 'src/decorators/roles-decorator';
 import { ReturnCartDto } from './dtos/return-cart-dto';
+import { UpdateCartDto } from './dtos/update-cart-dto';
 
 @Roles(UserType.Admin, UserType.User)
 @Controller('cart')
@@ -38,9 +41,31 @@ export class CartController {
     );
   }
 
+  @UsePipes(ValidationPipe)
+  @Patch()
+  async updateProductInCart(
+    @UserId() userId: number,
+    @Body() updateCartDto: UpdateCartDto,
+  ): Promise<ReturnCartDto> {
+    return new ReturnCartDto(
+      await this.cartService.updateProductInCart(updateCartDto, userId),
+    );
+  }
+
   @Delete()
   @HttpCode(204)
   async clearCart(@UserId() userId: number) {
     return this.cartService.clearCart(userId);
+  }
+
+  @Delete('product/:productId')
+  async deleteProductCart(
+    @Param('productId') productId: number,
+    @UserId() userId: number,
+  ) {
+    return this.cartService.deleteProductCart(
+      Number(userId),
+      Number(productId),
+    );
   }
 }

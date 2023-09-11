@@ -5,6 +5,7 @@ import { PrismaService } from 'src/prisma.service';
 import { CartProduct } from './entities/cart-product-entity';
 import { ProductService } from 'src/product/product.service';
 import { Product } from 'src/product/entities/product';
+import { UpdateCartDto } from 'src/cart/dtos/update-cart-dto';
 
 @Injectable()
 export class CartProductService {
@@ -67,5 +68,39 @@ export class CartProductService {
       data: { amount },
       where: { id: cartProduct.id, cart_id: cart.id },
     });
+  }
+
+  async updateProductInCart(
+    updateCartDto: UpdateCartDto,
+    cart: Cart,
+  ): Promise<CartProduct> {
+    const cartProduct: CartProduct = await this.verifyProductInCart(
+      updateCartDto.productId,
+      cart.id,
+    );
+
+    return this.prismaService.cartProduct.update({
+      data: { amount: updateCartDto.amount },
+      where: { id: cartProduct.id, cart_id: cart.id },
+    });
+  }
+
+  async deleteProductCart(productId: number, cartId: number): Promise<boolean> {
+    const cartProduct: CartProduct =
+      await this.prismaService.cartProduct.findFirst({
+        where: {
+          AND: [{ product_id: productId }, { cart_id: cartId }],
+        },
+      });
+
+    if (!cartProduct) {
+      throw new NotFoundException('Product not found in cart.');
+    }
+
+    await this.prismaService.cartProduct.delete({
+      where: { id: cartProduct.id },
+    });
+
+    return true;
   }
 }
