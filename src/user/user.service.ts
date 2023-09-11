@@ -76,12 +76,17 @@ export class UserService {
       throw new BadRequestException('Email in use.');
     }
 
+    if (createUserDto.confirmationPassword !== createUserDto.password) {
+      throw new BadRequestException("Passwords don't match.");
+    }
+
     const hashedPassword = await createHashedPassword(createUserDto.password);
 
     const raw = {
       ...createUserDto,
       password: hashedPassword,
       userType: UserType.User,
+      confirmationPassword: undefined,
     };
 
     return await this.prismaService.user.create({
