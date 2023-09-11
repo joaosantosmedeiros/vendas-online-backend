@@ -19,6 +19,7 @@ model User {
   userType  Int
   Address   Address[]
   Cart      Cart[]
+  Order     Order[]
 }
 
 model State {
@@ -51,6 +52,7 @@ model Address {
   id         Int      @id @default(autoincrement())
   city       City     @relation(fields: [city_id], references: [id])
   user       User     @relation(fields: [user_id], references: [id])
+  Order      Order[]
 }
 
 model Category {
@@ -62,15 +64,16 @@ model Category {
 }
 
 model Product {
-  id          Int           @id @default(autoincrement())
-  category_id Int
-  name        String
-  price       Float
-  image       String
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  CartProduct CartProduct[]
-  category    Category      @relation(fields: [category_id], references: [id])
+  id           Int            @id @default(autoincrement())
+  category_id  Int
+  name         String
+  price        Float
+  image        String
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  CartProduct  CartProduct[]
+  category     Category       @relation(fields: [category_id], references: [id])
+  OrderProduct OrderProduct[]
 }
 
 model Cart {
@@ -115,4 +118,31 @@ model Payment {
   payment_date    DateTime
   amount_payments Int
   payment_status  PaymentStatus @relation(fields: [status_id], references: [id])
+  Order           Order[]
+}
+
+model Order {
+  id           Int            @id @default(autoincrement())
+  user_id      Int
+  address_id   Int
+  date         DateTime
+  payment_id   Int
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  user         User           @relation(fields: [user_id], references: [id])
+  address      Address        @relation(fields: [address_id], references: [id])
+  payment      Payment        @relation(fields: [payment_id], references: [id])
+  OrderProduct OrderProduct[]
+}
+
+model OrderProduct {
+  id         Int      @id @default(autoincrement())
+  order_id   Int
+  product_id Int
+  amount     Int
+  price      Float
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  order      Order    @relation(fields: [order_id], references: [id])
+  product    Product  @relation(fields: [product_id], references: [id])
 }
