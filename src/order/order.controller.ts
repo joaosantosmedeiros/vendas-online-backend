@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Param,
   Post,
   UsePipes,
@@ -16,6 +17,11 @@ import { UserType } from 'src/user/enum/userType-enum';
 @Roles(UserType.User, UserType.Admin)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
+
+  @Get()
+  async findOrdersByUserId(@UserId() userId: number) {
+    return this.orderService.findOrdersByUserId(userId);
+  }
 
   @Post()
   @UsePipes(ValidationPipe)

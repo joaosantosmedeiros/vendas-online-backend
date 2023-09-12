@@ -12,12 +12,12 @@ import { Cart } from 'src/cart/entities/cart-entity';
 export class PaymentService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async createPayment(
-    createOrderDto: CreateOrderDto,
-    products: Product[],
-    cart: Cart,
-  ): Promise<Payment> {
-    const finalPrice = cart.CartProduct?.map((cartProduct) => {
+  generateFinalPrice(cart: Cart, products: Product[]) {
+    if (!cart.CartProduct || products.length == 0) {
+      return 0;
+    }
+
+    return cart.CartProduct.map((cartProduct) => {
       const product = products.find(
         (product) => product.id == cartProduct.product_id,
       );
@@ -30,6 +30,14 @@ export class PaymentService {
     }).reduce((finalPrice, price) => {
       return finalPrice + price;
     }, 0);
+  }
+
+  async createPayment(
+    createOrderDto: CreateOrderDto,
+    products: Product[],
+    cart: Cart,
+  ): Promise<Payment> {
+    const finalPrice = this.generateFinalPrice(cart, products);
 
     if (createOrderDto.amount_payments) {
       const paymentCreditCard = new PaymentCreditCard(

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { PaymentService } from 'src/payment/payment.service';
@@ -77,5 +77,24 @@ export class OrderService {
     await this.cartService.clearCart(userId);
 
     return order;
+  }
+
+  async findOrdersByUserId(userId: number): Promise<any> {
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        user_id: userId,
+      },
+      include: {
+        address: true,
+        OrderProduct: { include: { product: true } },
+        payment: { include: { payment_status: true } },
+      },
+    });
+
+    if (!orders || orders.length === 0) {
+      throw new NotFoundException('Orders not found.');
+    }
+
+    return orders;
   }
 }
