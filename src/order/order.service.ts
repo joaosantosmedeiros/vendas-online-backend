@@ -6,6 +6,7 @@ import { Payment } from 'src/payment/entities/payment';
 import { Order } from './entities/order';
 import { CartService } from 'src/cart/cart.service';
 import { OrderProductService } from 'src/order-product/order-product.service';
+import { ProductService } from 'src/product/product.service';
 
 @Injectable()
 export class OrderService {
@@ -14,6 +15,7 @@ export class OrderService {
     private readonly paymentService: PaymentService,
     private readonly cartService: CartService,
     private readonly orderProductService: OrderProductService,
+    private readonly productService: ProductService,
   ) {}
 
   async createOrder(
@@ -35,14 +37,21 @@ export class OrderService {
 
     const cart = await this.cartService.findCartByUserID(userId, true);
 
-    cart.CartProduct?.forEach(async (cartProduct) => {
-      await this.orderProductService.createOrderProduct(
-        cartProduct.product_id,
-        order.id,
-        cartProduct.amount,
-        0,
-      );
-    });
+    const products = await this.productService.findAll(
+      cart.CartProduct?.map((cartProduct) => cartProduct.product_id),
+    );
+
+    await Promise.all(
+      cart.CartProduct?.map((cartProduct) =>
+        this.orderProductService.createOrderProduct(
+          cartProduct.product_id,
+          order.id,
+          cartProduct.amount,
+          products.find((product) => product.id == cartProduct.product_id)
+            ?.price || 0,
+        ),
+      ),
+    );
 
     return order;
   }

@@ -5,10 +5,11 @@ import { PrismaService } from 'src/prisma.service';
 import { PaymentModule } from 'src/payment/payment.module';
 import { CartModule } from 'src/cart/cart.module';
 import { OrderProductModule } from 'src/order-product/order-product.module';
+import { ProductModule } from 'src/product/product.module';
 
 @Module({
   providers: [OrderService, PrismaService],
   controllers: [OrderController],
-  imports: [PaymentModule, CartModule, OrderProductModule],
+  imports: [PaymentModule, CartModule, OrderProductModule, ProductModule],
 })
 export class OrderModule {}

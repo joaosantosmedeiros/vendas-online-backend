@@ -12,8 +12,24 @@ export class ProductService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  async findAll(): Promise<Product[]> {
-    return await this.prismaService.product.findMany({});
+  async findAll(productsId?: number[]): Promise<Product[]> {
+    let findOptions = {};
+
+    if (productsId && productsId.length > 0) {
+      findOptions = {
+        where: {
+          id: { in: productsId },
+        },
+      };
+    }
+
+    const products = await this.prismaService.product.findMany(findOptions);
+
+    if (!products || products.length === 0) {
+      throw new NotFoundException('Products not found.');
+    }
+
+    return products;
   }
 
   async create(createProductDto: CreateProductDto): Promise<Product> {
