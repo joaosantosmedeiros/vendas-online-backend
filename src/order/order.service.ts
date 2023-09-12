@@ -2,16 +2,48 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { CreateOrderDto } from './dto/create-order-dto';
 import { PaymentService } from 'src/payment/payment.service';
+import { Payment } from 'src/payment/entities/payment';
+import { Order } from './entities/order';
+import { CartService } from 'src/cart/cart.service';
+import { OrderProductService } from 'src/order-product/order-product.service';
 
 @Injectable()
 export class OrderService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly paymentService: PaymentService,
+    private readonly cartService: CartService,
+    private readonly orderProductService: OrderProductService,
   ) {}
 
-  async createOrder(createOrderDto: CreateOrderDto, cartId: number) {
-    await this.paymentService.createPayment(createOrderDto);
-    return null;
+  async createOrder(
+    createOrderDto: CreateOrderDto,
+    cartId: number,
+    userId: number,
+  ): Promise<Order> {
+    const payment: Payment =
+      await this.paymentService.createPayment(createOrderDto);
+
+    const order = await this.prismaService.order.create({
+      data: {
+        address_id: createOrderDto.address_id,
+        date: new Date(),
+        payment_id: payment.id,
+        user_id: userId,
+      },
+    });
+
+    const cart = await this.cartService.findCartByUserID(userId, true);
+
+    cart.CartProduct?.forEach(async (cartProduct) => {
+      await this.orderProductService.createOrderProduct(
+        cartProduct.product_id,
+        order.id,
+        cartProduct.amount,
+        0,
+      );
+    });
+
+    return order;
   }
 }

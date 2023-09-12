@@ -9,5 +9,6 @@ import { UserModule } from '../user/user.module';
   controllers: [AddressController],
   providers: [AddressService, PrismaService],
   imports: [CityModule, UserModule],
+  exports: [AddressService],
 })
 export class AddressModule {}

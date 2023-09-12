@@ -2,6 +2,8 @@ import { Body, Controller, Get, Post } from '@nestjs/common';
 import { StateService } from './state.service';
 import { State } from './entities/state-entity';
 import { CreateStateDto } from './dtos/create-state-dto';
+import { Roles } from 'src/decorators/roles-decorator';
+import { UserType } from 'src/user/enum/userType-enum';
 
 @Controller('state')
 export class StateController {
@@ -13,6 +15,7 @@ export class StateController {
   }
 
   @Post()
+  @Roles(UserType.Admin)
   async createState(@Body() createStateDto: CreateStateDto): Promise<State> {
     return this.stateService.create(createStateDto);
   }
