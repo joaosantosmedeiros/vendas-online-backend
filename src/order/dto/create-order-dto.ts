@@ -7,7 +7,7 @@ export class CreateOrderDto {
 
   @IsOptional()
   @IsString()
-  pixCode?: number;
+  pixCode?: string;
 
   @IsOptional()
   @IsString()

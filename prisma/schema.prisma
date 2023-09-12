@@ -114,9 +114,9 @@ model Payment {
   type            String
   createdAt       DateTime      @default(now())
   updatedAt       DateTime      @updatedAt
-  code            Int
-  payment_date    DateTime
-  amount_payments Int
+  code            String?
+  payment_date    DateTime?
+  amount_payments Int?
   payment_status  PaymentStatus @relation(fields: [status_id], references: [id])
   Order           Order[]
 }
