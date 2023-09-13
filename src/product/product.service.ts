@@ -1,4 +1,9 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Inject,
+  Injectable,
+  NotFoundException,
+  forwardRef,
+} from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { Product } from './entities/product';
 import { CreateProductDto } from './dto/create-product-dto';
@@ -9,10 +14,15 @@ import { UpdateProductDto } from './dto/update-product-dto';
 export class ProductService {
   constructor(
     private readonly prismaService: PrismaService,
+
+    @Inject(forwardRef(() => CategoryService))
     private readonly categoryService: CategoryService,
   ) {}
 
-  async findAll(productsId?: number[]): Promise<Product[]> {
+  async findAll(
+    productsId?: number[],
+    isFindRelations?: boolean,
+  ): Promise<Product[]> {
     let findOptions = {};
 
     if (productsId && productsId.length > 0) {
@@ -20,6 +30,14 @@ export class ProductService {
         where: {
           id: { in: productsId },
         },
+      };
+    }
+
+    if (isFindRelations) {
+      findOptions = {
+        ...findOptions,
+        include: { category: true },
+        orderBy: { id: 'asc' },
       };
     }
 
@@ -66,8 +84,12 @@ export class ProductService {
     const product = await this.findProductById(productId);
     await this.categoryService.findCategoryById(updateProductDto.category_id);
     return await this.prismaService.product.update({
-      data: { ...product, ...updateProductDto },
+      data: { ...updateProductDto },
       where: { id: product.id },
     });
+  }
+
+  async countProductsByCategoryId(category_id: number): Promise<number> {
+    return this.prismaService.product.count({ where: { category_id } });
   }
 }

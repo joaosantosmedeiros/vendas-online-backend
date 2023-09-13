@@ -22,6 +22,13 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Roles(UserType.Admin)
+  @Get('all')
+  async getAllUsers(): Promise<ReturnUserDto[]> {
+    const users = await this.userService.getAllUsers();
+    return users.map((user) => new ReturnUserDto(user));
+  }
+
+  @Roles(UserType.Admin)
   @Get(':userId')
   async getUserById(@Param('userId') userId: number): Promise<ReturnUserDto> {
     return new ReturnUserDto(
@@ -29,11 +36,12 @@ export class UserController {
     );
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.User)
   @Get()
-  async getAllUsers(): Promise<ReturnUserDto[]> {
-    const users = await this.userService.getAllUsers();
-    return users.map((user) => new ReturnUserDto(user));
+  async getInfoUser(@UserId() userId: number): Promise<ReturnUserDto> {
+    return new ReturnUserDto(
+      await this.userService.getUserByIdUsingRelations(Number(userId)),
+    );
   }
 
   @UsePipes(ValidationPipe)

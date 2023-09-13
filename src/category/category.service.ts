@@ -12,7 +12,19 @@ export class CategoryService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async findAllCategories(): Promise<Category[]> {
-    return this.prismaService.category.findMany({});
+    const categories = await this.prismaService.category.findMany({
+      include: {
+        _count: {
+          select: { Product: true },
+        },
+      },
+    });
+
+    if (!categories || categories.length === 0) {
+      throw new NotFoundException('Categories not found.');
+    }
+
+    return categories;
   }
 
   async findCategoryById(id: number): Promise<Category> {

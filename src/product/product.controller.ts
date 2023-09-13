@@ -24,10 +24,10 @@ export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
   @Get()
-  async findAll(): Promise<ReturnProductDto[]> {
-    const categories = await this.productService.findAll();
+  async findAll(): Promise<any[]> {
+    const products = await this.productService.findAll([], true);
 
-    return categories.map((product) => new ReturnProductDto(product));
+    return products.map((product) => new ReturnProductDto(product));
   }
 
   @Roles(UserType.Admin)
