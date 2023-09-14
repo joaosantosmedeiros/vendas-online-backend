@@ -97,4 +97,18 @@ export class OrderService {
 
     return orders;
   }
+
+  async findAllOrders(): Promise<Order[]> {
+    const orders = await this.prismaService.order.findMany({
+      include: {
+        user: true,
+      },
+    });
+
+    if (!orders || orders.length === 0) {
+      throw new NotFoundException('Orders not found.');
+    }
+
+    return orders;
+  }
 }
