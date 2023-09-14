@@ -123,6 +123,7 @@ export class OrderService {
     const orders = await this.prismaService.order.findMany({
       include: {
         user: true,
+        _count: { select: { OrderProduct: true } },
       },
     });
 
@@ -130,6 +131,15 @@ export class OrderService {
       throw new NotFoundException('Orders not found.');
     }
 
-    return orders;
+    const ordersWithRenamedCount = orders.map((order) => {
+      const {
+        user,
+        _count: { OrderProduct: count },
+        ...rest
+      } = order;
+      return { user, productsAmount: count, ...rest };
+    });
+
+    return ordersWithRenamedCount;
   }
 }

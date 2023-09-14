@@ -15,4 +15,5 @@ export class Order {
   OrderProduct?: OrderProduct[];
   updatedAt: Date;
   createdAt: Date;
+  productsAmount?: number;
 }
