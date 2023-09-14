@@ -2,7 +2,7 @@ import { ReturnUserDto } from 'src/user/dtos/return-user-dto';
 import { Order } from '../entities/order';
 import { ReturnAddressDto } from 'src/address/dtos/return-address-dto';
 import { ReturnPaymentDto } from 'src/payment/dtos/return-payment-dto';
-import { OrderProduct } from 'src/order-product/entities/order-product';
+import { ReturnOrderProductDto } from 'src/order-product/dtos/return-order-product-dto';
 
 export class ReturnOrderDto {
   id: number;
@@ -10,7 +10,7 @@ export class ReturnOrderDto {
   user?: ReturnUserDto;
   address?: ReturnAddressDto;
   payment?: ReturnPaymentDto;
-  orderProduct?: OrderProduct[];
+  orderProduct?: ReturnOrderProductDto[];
 
   constructor(order: Order) {
     this.id = order.id;
@@ -22,6 +22,8 @@ export class ReturnOrderDto {
     this.payment = order.payment
       ? new ReturnPaymentDto(order.payment)
       : undefined;
-    this.orderProduct = order.OrderProduct;
+    this.orderProduct = order.OrderProduct.map(
+      (oP) => new ReturnOrderProductDto(oP),
+    );
   }
 }

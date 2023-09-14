@@ -1,5 +1,5 @@
 export class PaymentStatus {
-  id: string;
+  id: number;
   name: string;
   createdAt: Date;
   updatedAt: Date;
