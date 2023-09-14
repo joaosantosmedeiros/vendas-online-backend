@@ -79,7 +79,7 @@ export class OrderService {
     return order;
   }
 
-  async findOrdersByUserId(userId: number): Promise<any> {
+  async findOrdersByUserId(userId: number): Promise<Order[]> {
     const orders = await this.prismaService.order.findMany({
       where: {
         user_id: userId,
@@ -92,6 +92,27 @@ export class OrderService {
     });
 
     if (!orders || orders.length === 0) {
+      throw new NotFoundException('Orders not found.');
+    }
+
+    return orders;
+  }
+
+  async findOrdersById(orderId?: number, userId?: number): Promise<Order[]> {
+    const orders = await this.prismaService.order.findMany({
+      where: {
+        id: orderId,
+        user_id: userId,
+      },
+      include: {
+        address: true,
+        OrderProduct: { include: { product: true } },
+        payment: { include: { payment_status: true } },
+        user: !!orderId,
+      },
+    });
+
+    if (!orders) {
       throw new NotFoundException('Orders not found.');
     }
 
