@@ -1,7 +1,7 @@
 export interface State {
   id: number;
   name: string;
-  sigla: string;
+  uf: string;
   createdAt: Date;
   updatedAt: Date;
 }

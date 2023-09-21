@@ -35,6 +35,24 @@ export class CityService {
     });
   }
 
+  async getCityByName(nameCity: string, nameState: string): Promise<City> {
+    const city = await this.prismaService.city.findFirst({
+      where: {
+        name: nameCity,
+        state: { uf: nameState },
+      },
+      include: {
+        state: true,
+      },
+    });
+
+    if (!city) {
+      throw new NotFoundException('City not found.');
+    }
+
+    return city;
+  }
+
   async create(data: CreateCityDto): Promise<City> {
     return this.prismaService.city.create({
       data,

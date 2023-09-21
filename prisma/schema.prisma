@@ -25,7 +25,7 @@ model User {
 model State {
   id        Int      @id @default(autoincrement())
   name      String
-  sigla     String
+  uf     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   City      City[]
