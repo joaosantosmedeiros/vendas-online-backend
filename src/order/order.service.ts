@@ -10,6 +10,7 @@ import { ProductService } from 'src/product/product.service';
 import { Cart } from 'src/cart/entities/cart-entity';
 import { Product } from 'src/product/entities/product';
 import { OrderProduct } from 'src/order-product/entities/order-product';
+import { AddressService } from 'src/address/address.service';
 
 @Injectable()
 export class OrderService {
@@ -19,6 +20,7 @@ export class OrderService {
     private readonly cartService: CartService,
     private readonly orderProductService: OrderProductService,
     private readonly productService: ProductService,
+    private readonly addressService: AddressService,
   ) {}
 
   async saveOrder(
@@ -70,6 +72,8 @@ export class OrderService {
       cart,
     );
 
+    await this.addressService.getAddressByUserId(userId);
+
     const order = await this.saveOrder(createOrderDto, payment, userId);
 
     await this.createOrderProductsUsingCart(cart, order.id, products);
@@ -105,7 +109,7 @@ export class OrderService {
         user_id: userId,
       },
       include: {
-        address: true,
+        address: { include: { city: { include: { state: true } } } },
         OrderProduct: { include: { product: true } },
         payment: { include: { payment_status: true } },
         user: !!orderId,
