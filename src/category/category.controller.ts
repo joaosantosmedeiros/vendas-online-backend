@@ -30,6 +30,15 @@ export class CategoryController {
     return categories.map((category) => new ReturnCategoryDto(category));
   }
 
+  @Get(':categoryId')
+  async findCategoryById(
+    @Param('categoryId') categoryId: number,
+  ): Promise<ReturnCategoryDto> {
+    return new ReturnCategoryDto(
+      await this.categoryService.findCategoryById(Number(categoryId), true),
+    );
+  }
+
   @Roles(UserType.Admin, UserType.Root)
   @UsePipes(ValidationPipe)
   @Post()
