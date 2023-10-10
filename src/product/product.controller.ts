@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
@@ -21,6 +22,16 @@ import { UpdateProductDto } from './dto/update-product-dto';
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
+
+  @Roles(UserType.Admin, UserType.Root, UserType.User)
+  @Get('page')
+  async findAllPage(
+    @Query('search') search: string,
+  ): Promise<ReturnProductDto[]> {
+    const products = await this.productService.findAllPage(search);
+
+    return products.map((product) => new ReturnProductDto(product));
+  }
 
   @Roles(UserType.Admin, UserType.Root, UserType.User)
   @Get()

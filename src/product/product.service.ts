@@ -19,6 +19,25 @@ export class ProductService {
     private readonly categoryService: CategoryService,
   ) {}
 
+  async findAllPage(search: string): Promise<Product[]> {
+    const products = await this.prismaService.product.findMany({
+      where: {
+        name: { contains: search, mode: 'insensitive' },
+      },
+      include: {
+        category: {
+          include: { _count: { select: { Product: true } } },
+        },
+      },
+    });
+
+    if (!products || products.length === 0) {
+      throw new NotFoundException('Products not found.');
+    }
+
+    return products;
+  }
+
   async findAll(
     productsId?: number[],
     isFindRelations?: boolean,
@@ -36,7 +55,15 @@ export class ProductService {
     if (isFindRelations) {
       findOptions = {
         ...findOptions,
-        include: { category: true },
+        include: {
+          category: {
+            include: {
+              _count: {
+                select: { Product: true },
+              },
+            },
+          },
+        },
         orderBy: { id: 'asc' },
       };
     }
@@ -61,7 +88,9 @@ export class ProductService {
   async findProductById(id: number, isRelations?: boolean): Promise<Product> {
     const relations = isRelations
       ? {
-          category: true,
+          category: {
+            include: { _count: { select: { Product: true } } },
+          },
         }
       : undefined;
 
