@@ -27,11 +27,21 @@ export class CategoryService {
     return categories;
   }
 
-  async findCategoryById(id: number): Promise<Category> {
+  async findCategoryById(id: number, isRelation?: boolean): Promise<Category> {
+    const relations = isRelation
+      ? {
+          Product: true,
+          _count: {
+            select: { Product: true },
+          },
+        }
+      : undefined;
+
     const category = await this.prismaService.category.findFirst({
       where: {
         id,
       },
+      include: relations,
     });
 
     if (!category) {
@@ -68,6 +78,18 @@ export class CategoryService {
 
     return this.prismaService.category.create({
       data: createCategoryDto,
+    });
+  }
+
+  async deleteCategory(id: number) {
+    const category = await this.findCategoryById(id, true);
+
+    if (category.Product.length != 0) {
+      throw new BadRequestException('Category have relations.');
+    }
+
+    await this.prismaService.category.delete({
+      where: { id: category.id },
     });
   }
 }

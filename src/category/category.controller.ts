@@ -1,7 +1,10 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  HttpCode,
+  Param,
   Post,
   UsePipes,
   ValidationPipe,
@@ -32,5 +35,13 @@ export class CategoryController {
     @Body() createCategoryDto: CreateCategoryDto,
   ): Promise<Category> {
     return await this.categoryService.createCategory(createCategoryDto);
+  }
+
+  @Roles(UserType.Admin, UserType.Root)
+  @UsePipes(ValidationPipe)
+  @HttpCode(204)
+  @Delete(':categoryId')
+  async deleteCategory(@Param('categoryId') categoryId: number): Promise<void> {
+    return this.categoryService.deleteCategory(Number(categoryId));
   }
 }
