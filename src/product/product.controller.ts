@@ -18,16 +18,26 @@ import { CreateProductDto } from './dto/create-product-dto';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product-dto';
 
-@Roles(UserType.Admin, UserType.Root, UserType.User)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
+  @Roles(UserType.Admin, UserType.Root, UserType.User)
   @Get()
-  async findAll(): Promise<any[]> {
+  async findAll(): Promise<ReturnProductDto[]> {
     const products = await this.productService.findAll([], true);
 
     return products.map((product) => new ReturnProductDto(product));
+  }
+
+  @Roles(UserType.Admin, UserType.Root, UserType.User)
+  @Get(':productId')
+  async findProductById(
+    @Param('productId') productId: number,
+  ): Promise<ReturnProductDto> {
+    return new ReturnProductDto(
+      await this.productService.findProductById(Number(productId), true),
+    );
   }
 
   @Roles(UserType.Admin, UserType.Root)

@@ -8,6 +8,8 @@ export class ReturnCategoryDto {
   constructor(category: Category) {
     this.name = category.name;
     this.id = category.id;
-    this.productsAmount = category._count.Product;
+    this.productsAmount = category._count?.Product
+      ? category._count.Product
+      : undefined;
   }
 }

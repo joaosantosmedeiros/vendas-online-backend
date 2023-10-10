@@ -58,9 +58,16 @@ export class ProductService {
     });
   }
 
-  async findProductById(id: number): Promise<Product> {
+  async findProductById(id: number, isRelations?: boolean): Promise<Product> {
+    const relations = isRelations
+      ? {
+          category: true,
+        }
+      : undefined;
+
     const product = await this.prismaService.product.findFirst({
       where: { id },
+      include: relations,
     });
 
     if (!product) {
