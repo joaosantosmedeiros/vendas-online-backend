@@ -13,7 +13,7 @@ import { UserType } from 'src/user/enum/userType-enum';
 import { CreateCategoryDto } from './dtos/create-category-dto';
 import { Category } from './entities/category';
 
-@Roles(UserType.Admin, UserType.User)
+@Roles(UserType.Admin, UserType.Root, UserType.User)
 @Controller('category')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
@@ -25,7 +25,7 @@ export class CategoryController {
     return categories.map((category) => new ReturnCategoryDto(category));
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @UsePipes(ValidationPipe)
   @Post()
   async createCategory(

@@ -15,7 +15,7 @@ export class StateController {
   }
 
   @Post()
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   async createState(@Body() createStateDto: CreateStateDto): Promise<State> {
     return this.stateService.create(createStateDto);
   }

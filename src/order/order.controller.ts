@@ -16,7 +16,7 @@ import { Order } from './entities/order';
 import { ReturnOrderDto } from './dto/return-order-dto';
 
 @Controller('order')
-@Roles(UserType.User, UserType.Admin)
+@Roles(UserType.User, UserType.Admin, UserType.Root)
 export class OrderController {
   constructor(private readonly orderService: OrderService) {}
 
@@ -25,7 +25,7 @@ export class OrderController {
     return this.orderService.findOrdersByUserId(userId);
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @Get('all')
   async findAllOrders(): Promise<ReturnOrderDto[]> {
     return (await this.orderService.findAllOrders()).map(
@@ -33,7 +33,7 @@ export class OrderController {
     );
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @Get(':orderId')
   async findOrderById(
     @Param('orderId') orderId: number,

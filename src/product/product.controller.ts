@@ -18,7 +18,7 @@ import { CreateProductDto } from './dto/create-product-dto';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product-dto';
 
-@Roles(UserType.Admin, UserType.User)
+@Roles(UserType.Admin, UserType.Root, UserType.User)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
@@ -30,14 +30,14 @@ export class ProductController {
     return products.map((product) => new ReturnProductDto(product));
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @UsePipes(ValidationPipe)
   @Post()
   async create(@Body() createProductDto: CreateProductDto): Promise<Product> {
     return this.productService.create(createProductDto);
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @UsePipes(ValidationPipe)
   @Delete(':productId')
   @HttpCode(204)
@@ -46,7 +46,7 @@ export class ProductController {
     await this.productService.delete(productId);
   }
 
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   @UsePipes(ValidationPipe)
   @Put(':productId')
   async update(

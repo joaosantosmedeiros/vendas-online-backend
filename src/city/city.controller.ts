@@ -14,7 +14,7 @@ export class CityController {
   }
 
   @Post()
-  @Roles(UserType.Admin)
+  @Roles(UserType.Admin, UserType.Root)
   async create(@Body() createCityDto: CreateCityDto) {
     return this.cityService.create(createCityDto);
   }

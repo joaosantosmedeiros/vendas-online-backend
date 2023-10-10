@@ -67,7 +67,10 @@ export class UserService {
     return user;
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<User> {
+  async createUser(
+    createUserDto: CreateUserDto,
+    userType?: number,
+  ): Promise<User> {
     const user = await this.getUserByEmail(createUserDto.email).catch(
       () => undefined,
     );
@@ -85,7 +88,7 @@ export class UserService {
     const raw = {
       ...createUserDto,
       password: hashedPassword,
-      userType: UserType.User,
+      userType: userType ? userType : UserType.User,
       confirmationPassword: undefined,
     };
 

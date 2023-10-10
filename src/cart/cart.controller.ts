@@ -18,7 +18,7 @@ import { Roles } from 'src/decorators/roles-decorator';
 import { ReturnCartDto } from './dtos/return-cart-dto';
 import { UpdateCartDto } from './dtos/update-cart-dto';
 
-@Roles(UserType.Admin, UserType.User)
+@Roles(UserType.Admin, UserType.Root, UserType.User)
 @Controller('cart')
 export class CartController {
   constructor(private readonly cartService: CartService) {}
