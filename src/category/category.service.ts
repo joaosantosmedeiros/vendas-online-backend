@@ -6,6 +6,7 @@ import {
 import { PrismaService } from 'src/prisma.service';
 import { CreateCategoryDto } from './dtos/create-category-dto';
 import { Category } from './entities/category';
+import { UpdateCategoryDto } from './dtos/update-category-dto';
 
 @Injectable()
 export class CategoryService {
@@ -78,6 +79,23 @@ export class CategoryService {
 
     return this.prismaService.category.create({
       data: createCategoryDto,
+    });
+  }
+
+  async editCategory(
+    categoryId: number,
+    updateCategory: UpdateCategoryDto,
+  ): Promise<Category> {
+    const category = await this.findCategoryById(categoryId);
+
+    return this.prismaService.category.update({
+      where: { id: category.id },
+      data: updateCategory,
+      include: {
+        _count: {
+          select: { Product: true },
+        },
+      },
     });
   }
 
