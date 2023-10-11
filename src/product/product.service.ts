@@ -9,6 +9,10 @@ import { Product } from './entities/product';
 import { CreateProductDto } from './dto/create-product-dto';
 import { CategoryService } from 'src/category/category.service';
 import { UpdateProductDto } from './dto/update-product-dto';
+import { PaginationDto, PaginationMeta } from 'src/dtos/pagination-dto';
+
+const DEFAULT_PAGE_SIZE = 10;
+const FIRST_PAGE = 1;
 
 @Injectable()
 export class ProductService {
@@ -19,23 +23,48 @@ export class ProductService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  async findAllPage(search: string): Promise<Product[]> {
-    const products = await this.prismaService.product.findMany({
-      where: {
-        name: { contains: search, mode: 'insensitive' },
-      },
-      include: {
-        category: {
-          include: { _count: { select: { Product: true } } },
+  async findAllPage(
+    search: string,
+    size = DEFAULT_PAGE_SIZE,
+    page = FIRST_PAGE,
+  ): Promise<PaginationDto<Product[]>> {
+    const skip = (page - 1) * size;
+
+    const [products, count] = await this.prismaService.$transaction([
+      this.prismaService.product.findMany({
+        where: {
+          name: { contains: search, mode: 'insensitive' },
         },
-      },
-    });
+        include: {
+          category: {
+            include: { _count: { select: { Product: true } } },
+          },
+        },
+        take: Number(size),
+        skip,
+      }),
+      this.prismaService.product.count({
+        where: {
+          name: { contains: search, mode: 'insensitive' },
+        },
+        take: Number(size),
+        skip,
+      }),
+    ]);
 
     if (!products || products.length === 0) {
       throw new NotFoundException('Products not found.');
     }
 
-    return products;
+    return new PaginationDto(
+      new PaginationMeta(
+        Number(size),
+        count,
+        Number(page),
+        Math.ceil(count / size),
+      ),
+      products,
+    );
   }
 
   async findAll(

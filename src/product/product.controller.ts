@@ -18,6 +18,7 @@ import { ReturnProductDto } from './dto/return-product-dto';
 import { CreateProductDto } from './dto/create-product-dto';
 import { Product } from '@prisma/client';
 import { UpdateProductDto } from './dto/update-product-dto';
+import { PaginationDto } from 'src/dtos/pagination-dto';
 
 @Controller('product')
 export class ProductController {
@@ -26,11 +27,13 @@ export class ProductController {
   @Roles(UserType.Admin, UserType.Root, UserType.User)
   @Get('page')
   async findAllPage(
-    @Query('search') search: string,
-  ): Promise<ReturnProductDto[]> {
-    const products = await this.productService.findAllPage(search);
+    @Query('search') search?: string,
+    @Query('size') size?: number,
+    @Query('page') page?: number,
+  ): Promise<PaginationDto<Product[]>> {
+    return this.productService.findAllPage(search, size, page);
 
-    return products.map((product) => new ReturnProductDto(product));
+    // return products.map((product) => new ReturnProductDto(product));
   }
 
   @Roles(UserType.Admin, UserType.Root, UserType.User)
